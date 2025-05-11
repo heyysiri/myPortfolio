@@ -65,6 +65,35 @@ const surfaceImageStyles = {
   animation: 'fadeIn 1s forwards'
 } as const;
 
+// Responsive scaling for planet sizes and positions
+function useResponsiveSettings() {
+  const { viewport } = useThree();
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkIsMobile();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIsMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+  
+  // Scale factor based on viewport size - increased to make planets larger
+  const scaleFactor = isMobile ? 1.2 : 1.5;
+  
+  // Adjusted position multiplier to spread planets out more
+  const positionMultiplier = isMobile ? 0.8 : 1.2;
+  
+  return { scaleFactor, positionMultiplier, isMobile, viewport };
+}
+
 interface PlanetProps {
   position: [number, number, number];
   size: number;
@@ -101,10 +130,28 @@ const Planet = ({
   const initialPosition = useRef<[number, number, number]>(position);
   const time = useRef(Math.random() * 100);
   
+  // Get responsive settings
+  const { scaleFactor, positionMultiplier } = useResponsiveSettings();
+  
+  // Adjust position based on responsiveness
+  const responsivePosition: [number, number, number] = [
+    position[0] * positionMultiplier,
+    position[1] * positionMultiplier,
+    position[2] * positionMultiplier
+  ];
+  
+  // Adjust size based on responsiveness
+  const responsiveSize = size * scaleFactor;
+  
   // Load texture properly - always call hook at the top level
   const planetTexture = useLoader(TextureLoader, texture);
   // Always call useLoader at the top level with a fallback texture
   const ringTextureObject = useLoader(TextureLoader, ringTexture || texture);
+  
+  useEffect(() => {
+    // Update initial position when responsive values change
+    initialPosition.current = responsivePosition;
+  }, [responsivePosition]);
   
   useFrame((state, delta) => {
     if (planetRef.current) {
@@ -126,8 +173,8 @@ const Planet = ({
       // Orbit rotation
       time.current += delta;
       
-      const x = Math.cos(time.current * orbitSpeed) * orbitRadius;
-      const z = Math.sin(time.current * orbitSpeed) * orbitRadius;
+      const x = Math.cos(time.current * orbitSpeed) * orbitRadius * positionMultiplier;
+      const z = Math.sin(time.current * orbitSpeed) * orbitRadius * positionMultiplier;
       
       groupRef.current.position.x = initialPosition.current[0] + x;
       groupRef.current.position.z = initialPosition.current[2] + z;
@@ -135,10 +182,10 @@ const Planet = ({
   });
 
   return (
-    <group ref={groupRef} position={position}>
+    <group ref={groupRef} position={responsivePosition}>
       {/* Subtle glow effect */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[size * 1.2, 32, 32]} />
+        <sphereGeometry args={[responsiveSize * 1.2, 32, 32]} />
         <meshBasicMaterial 
           color={glowColor} 
           transparent={true} 
@@ -154,7 +201,7 @@ const Planet = ({
         receiveShadow
         onClick={onSelect}
       >
-        <sphereGeometry args={[size, 64, 64]} />
+        <sphereGeometry args={[responsiveSize, 64, 64]} />
         <meshStandardMaterial 
           map={planetTexture} 
           metalness={0.4}
@@ -169,7 +216,7 @@ const Planet = ({
           rotation={[Math.PI / 2.5, 0, 0]}
           position={[0, 0, 0]}
         >
-          <ringGeometry args={[size * ringSize[0], size * ringSize[1], 128]} />
+          <ringGeometry args={[responsiveSize * ringSize[0], responsiveSize * ringSize[1], 128]} />
           <meshStandardMaterial 
             color="#ffffff"
             map={ringTexture ? ringTextureObject : null}
@@ -188,6 +235,7 @@ const Planet = ({
   );
 };
 
+// Camera controller component
 const CameraController = ({ 
   selectedPlanet, 
   onZoomComplete 
@@ -198,6 +246,7 @@ const CameraController = ({
   const { camera } = useThree();
   const zoomingComplete = useRef(false);
   const zoomTimer = useRef<NodeJS.Timeout | null>(null);
+  const { positionMultiplier, isMobile } = useResponsiveSettings();
   
   useEffect(() => {
     if (!selectedPlanet) {
@@ -212,7 +261,7 @@ const CameraController = ({
   useFrame(() => {
     if (selectedPlanet) {
       // Find the planet's position
-      const planetPositions: { [key: string]: [number, number, number] } = {
+      const basePlanetPositions: { [key: string]: [number, number, number] } = {
         'Mercury': [-75, 45, -10],
         'Venus': [70, 50, 0],
         'Earth': [-60, -10, 5],
@@ -223,10 +272,19 @@ const CameraController = ({
         'Neptune': [40, -45, -5]
       };
       
+      // Apply responsive scaling to positions
+      const planetPositions: { [key: string]: [number, number, number] } = Object.fromEntries(
+        Object.entries(basePlanetPositions).map(([key, pos]) => [
+          key,
+          [pos[0] * positionMultiplier, pos[1] * positionMultiplier, pos[2] * positionMultiplier]
+        ])
+      );
+      
       const targetPosition = planetPositions[selectedPlanet];
       if (targetPosition) {
         // Get closer to the planet but not too close
-        const zoomDistance = 10; // Very close zoom
+        // Adjust zoom distance for mobile
+        const zoomDistance = isMobile ? 15 : 10;
         const targetX = targetPosition[0];
         const targetY = targetPosition[1];
         const targetZ = targetPosition[2] + zoomDistance;
@@ -256,9 +314,11 @@ const CameraController = ({
       }
     } else {
       // Return to default position
+      // Adjust default camera position for mobile
+      const defaultZ = isMobile ? 200 : 160;
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0, 0.02);
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0, 0.02);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 160, 0.02);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, defaultZ, 0.02);
       camera.lookAt(0, 0, 0);
     }
   });
@@ -266,10 +326,24 @@ const CameraController = ({
   return null;
 };
 
-// Separate component for the landing alert
+// Landing alert component
 const LandingAlert = ({ planet }: { planet: string | null }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [message, setMessage] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check if we're on mobile
+    setIsMobile(window.innerWidth < 768);
+    
+    // Handle window resize
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (planet) {
@@ -291,10 +365,17 @@ const LandingAlert = ({ planet }: { planet: string | null }) => {
 
   if (!showAlert) return null;
 
+  // Adjust styles for mobile
+  const mobileStyles = isMobile ? {
+    fontSize: '16px',
+    padding: '15px 25px'
+  } : {};
+
   return createPortal(
     <div style={{
       ...landingAlertStyles,
-      opacity: showAlert ? 1 : 0, // Ensure opacity is 1 when showing
+      ...mobileStyles,
+      opacity: showAlert ? 1 : 0,
       animation: 'fadeIn 0.3s ease-in-out'
     }}>
       {message}
@@ -303,9 +384,23 @@ const LandingAlert = ({ planet }: { planet: string | null }) => {
   );
 };
 
-// Surface component that shows the planet surface image
+// Surface view component
 const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () => void }) => {
   const [surfaceImage, setSurfaceImage] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    // Check if we're on mobile
+    setIsMobile(window.innerWidth < 768);
+    
+    // Handle window resize
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   useEffect(() => {
     if (!planet) {
@@ -329,6 +424,10 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
   }, [planet]);
   
   if (!surfaceImage || !planet) return null;
+  
+  // Adjust text size for mobile
+  const fontSize = isMobile ? '12px' : '14px';
+  const labelFontSize = isMobile ? '16px' : '18px';
   
   return createPortal(
     <div 
@@ -356,7 +455,7 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         right: '20px',
         color: 'white',
         fontFamily: "'Orbitron', sans-serif",
-        fontSize: '14px',
+        fontSize: fontSize,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         padding: '10px',
         borderRadius: '5px',
@@ -372,7 +471,7 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         left: '20px',
         color: 'white',
         fontFamily: "'Orbitron', sans-serif",
-        fontSize: '18px',
+        fontSize: labelFontSize,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         padding: '10px',
         borderRadius: '5px',
@@ -382,6 +481,36 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
       </div>
     </div>,
     document.body
+  );
+};
+
+// Scene wrapper component that provides responsive context
+const ResponsiveCanvasWrapper = ({ children }: { children: React.ReactNode }) => {
+  const [aspectRatio, setAspectRatio] = useState(window.innerWidth / window.innerHeight);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setAspectRatio(window.innerWidth / window.innerHeight);
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Adjust field of view based on device type and aspect ratio
+  const fov = isMobile ? 
+    (aspectRatio < 1 ? 75 : 60) : // Portrait vs landscape on mobile
+    45;                           // Desktop
+  
+  // Adjust camera z position based on device type
+  const cameraZ = isMobile ? 200 : 160;
+  
+  return (
+    <Canvas camera={{ position: [0, 0, cameraZ], fov: fov }}>
+      {children}
+    </Canvas>
   );
 };
 
@@ -413,10 +542,26 @@ export default function Scene() {
             from { opacity: 0; }
             to { opacity: 1; }
           }
+          
+          /* Make the canvas container responsive */
+          html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+          }
+          
+          @media (max-width: 768px) {
+            /* Mobile-specific styles */
+            html, body {
+              font-size: 14px;
+            }
+          }
         `}
       </style>
       
-      <Canvas camera={{ position: [0, 0, 160], fov: 45 }}> {/* Reduced FOV for better perspective */}
+      <ResponsiveCanvasWrapper>
         <ambientLight intensity={0.6} />
         <pointLight position={[0, 0, 60]} intensity={2.5} color="#f8f0dd" />
         <directionalLight position={[10, 10, 5]} intensity={1.2} />
@@ -427,10 +572,10 @@ export default function Scene() {
         />
         
         <Suspense fallback={null}>
-          {/* Mercury */}
+          {/* Mercury - increased size from 2.0 to 3.0 */}
           <Planet 
             position={[-75, 45, -10]} 
-            size={2.0} 
+            size={3.0} 
             texture={mercuryTexture}
             rotationSpeed={0.015} 
             orbitRadius={2}
@@ -440,10 +585,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Mercury' ? null : 'Mercury')}
           />
           
-          {/* Venus */}
+          {/* Venus - increased size from 2.4 to 3.6 */}
           <Planet 
             position={[70, 50, 0]} 
-            size={2.4} 
+            size={3.6} 
             texture={venusTexture}
             rotationSpeed={0.012} 
             orbitRadius={2}
@@ -453,10 +598,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Venus' ? null : 'Venus')}
           />
           
-          {/* Earth */}
+          {/* Earth - increased size from 2.5 to 3.8 */}
           <Planet 
             position={[-60, -10, 5]} 
-            size={2.5} 
+            size={3.8} 
             texture={earthTexture}
             rotationSpeed={0.01} 
             orbitRadius={2}
@@ -466,10 +611,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Earth' ? null : 'Earth')}
           />
           
-          {/* Mars */}
+          {/* Mars - increased size from 2.3 to 3.5 */}
           <Planet 
             position={[65, -15, -5]} 
-            size={2.3} 
+            size={3.5} 
             texture={marsTexture}
             rotationSpeed={0.009} 
             orbitRadius={2}
@@ -479,10 +624,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Mars' ? null : 'Mars')}
           />
           
-          {/* Jupiter */}
+          {/* Jupiter - increased size from 4.5 to 6.5 */}
           <Planet 
             position={[-20, -50, 0]} 
-            size={4.5} 
+            size={6.5} 
             texture={jupiterTexture}
             rotationSpeed={0.007} 
             orbitRadius={2}
@@ -492,10 +637,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Jupiter' ? null : 'Jupiter')}
           />
           
-          {/* Saturn */}
+          {/* Saturn - increased size from 4.0 to 6.0 */}
           <Planet 
             position={[5, 0, 20]} 
-            size={4.0} 
+            size={6.0} 
             texture={saturnTexture}
             rotationSpeed={0.006} 
             orbitRadius={2}
@@ -508,10 +653,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Saturn' ? null : 'Saturn')}
           />
           
-          {/* Uranus */}
+          {/* Uranus - increased size from 3.0 to 4.5 */}
           <Planet 
             position={[15, 55, 5]} 
-            size={3.0} 
+            size={4.5} 
             texture={uranusTexture}
             rotationSpeed={0.005} 
             orbitRadius={2}
@@ -521,10 +666,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Uranus' ? null : 'Uranus')}
           />
           
-          {/* Neptune */}
+          {/* Neptune - increased size from 2.8 to 4.2 */}
           <Planet 
             position={[40, -45, -5]} 
-            size={2.8} 
+            size={4.2} 
             texture={neptuneTexture}
             rotationSpeed={0.004} 
             orbitRadius={2}
@@ -538,7 +683,7 @@ export default function Scene() {
         </Suspense>
         
         <OrbitControls enableZoom={true} enablePan={true} />
-      </Canvas>
+      </ResponsiveCanvasWrapper>
       
       <LandingAlert planet={selectedPlanet} />
       
