@@ -1,11 +1,12 @@
 'use client';
 
-import { Canvas, useLoader, useFrame as useThreeFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, Text, Billboard } from '@react-three/drei';
-import { Suspense, useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { Canvas, useLoader, useFrame } from '@react-three/fiber';
+import { OrbitControls, Stars } from '@react-three/drei';
+import { Suspense, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { TextureLoader } from 'three';
+import { useThree } from '@react-three/fiber';
+import { createPortal } from 'react-dom';
 
 // Create textures for different planets
 const mercuryTexture = '/textures/mercury.jpg';
@@ -17,6 +18,52 @@ const saturnTexture = '/textures/saturn.jpg';
 const saturnRingTexture = '/textures/saturn_ring.png';
 const uranusTexture = '/textures/uranus.jpg';
 const neptuneTexture = '/textures/neptune.jpg';
+
+// Surface images for planets
+const mercurySurface = '/surfaces/mercury.jpeg';
+const venusSurface = '/surfaces/venus.jpg';
+const earthSurface = '/surfaces/earth.jpeg';
+const marsSurface = '/surfaces/mars.jpg';
+const jupiterSurface = '/surfaces/jupiter.jpg';
+const saturnSurface = '/surfaces/saturn.jpg';
+const uranusSurface = '/surfaces/uranus.jpg';
+const neptuneSurface = '/surfaces/neptune.jpg';
+
+// Add landing alert styles
+const landingAlertStyles = {
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  color: '#ff0000',
+  padding: '20px 40px',
+  borderRadius: '5px',
+  border: '2px solid #ff0000',
+  fontFamily: "'Orbitron', sans-serif",
+  fontSize: '24px',
+  textTransform: 'uppercase',
+  letterSpacing: '2px',
+  zIndex: 1000,
+  opacity: 0,
+  transition: 'opacity 0.5s ease-in-out',
+  textShadow: '0 0 10px #ff0000',
+  boxShadow: '0 0 20px rgba(255, 0, 0, 0.5)'
+} as const;
+
+// Surface image styles
+const surfaceImageStyles = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  zIndex: 999,
+  opacity: 0,
+  transition: 'opacity 1s ease-in-out',
+  objectFit: 'cover',
+  animation: 'fadeIn 1s forwards'
+} as const;
 
 interface PlanetProps {
   position: [number, number, number];
@@ -30,7 +77,6 @@ interface PlanetProps {
   ringSize?: [number, number];
   glowColor?: string;
   glowIntensity?: number;
-  name: string;
 }
 
 const Planet = ({ 
@@ -45,45 +91,30 @@ const Planet = ({
   ringSize = [1.3, 2],
   glowColor = "#ffffff",
   glowIntensity = 0.15,
-  name
-}: PlanetProps) => {
+  isSelected,
+  onSelect
+}: PlanetProps & { isSelected: boolean; onSelect: () => void }) => {
   const planetRef = useRef<THREE.Mesh>(null);
   const ringsRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
-  const textRef = useRef<THREE.Group>(null);
   const initialPosition = useRef<[number, number, number]>(position);
   const time = useRef(Math.random() * 100);
-  const [hovered, setHovered] = useState(false);
-  const [textOpacity, setTextOpacity] = useState(0);
-  const [textScale, setTextScale] = useState(0);
   
   // Load texture properly - always call hook at the top level
   const planetTexture = useLoader(TextureLoader, texture);
   // Always call useLoader at the top level with a fallback texture
   const ringTextureObject = useLoader(TextureLoader, ringTexture || texture);
   
-  // Animation for label
-  useThreeFrame(({ clock }) => {
-    if (textRef.current) {
-      // Floating animation
-      textRef.current.position.y = size * 1.8 + Math.sin(clock.getElapsedTime() * 2) * 0.3;
-      
-      // Fade in/out
-      if (hovered) {
-        setTextOpacity(Math.min(textOpacity + 0.05, 1));
-        setTextScale(Math.min(textScale + 0.05, 1));
-      } else {
-        setTextOpacity(Math.max(textOpacity - 0.05, 0));
-        setTextScale(Math.max(textScale - 0.05, 0));
-      }
-    }
-  });
-  
   useFrame((state, delta) => {
     if (planetRef.current) {
       // Self rotation
       planetRef.current.rotation.y += rotationSpeed;
+      
+      // Smooth scale transition
+      const currentScale = planetRef.current.scale.x;
+      const newScale = THREE.MathUtils.lerp(currentScale, isSelected ? 1.5 : 1, 0.1);
+      planetRef.current.scale.set(newScale, newScale, newScale);
     }
     
     if (ringsRef.current && hasRings) {
@@ -111,7 +142,7 @@ const Planet = ({
         <meshBasicMaterial 
           color={glowColor} 
           transparent={true} 
-          opacity={glowIntensity}
+          opacity={isSelected ? glowIntensity * 2 : glowIntensity}
           side={THREE.BackSide}
         />
       </mesh>
@@ -121,8 +152,7 @@ const Planet = ({
         ref={planetRef} 
         castShadow 
         receiveShadow
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+        onClick={onSelect}
       >
         <sphereGeometry args={[size, 64, 64]} />
         <meshStandardMaterial 
@@ -131,31 +161,6 @@ const Planet = ({
           roughness={0.7}
         />
       </mesh>
-      
-      {/* Planet name label */}
-      <Billboard
-        ref={textRef}
-        position={[0, size * 1.8, 0]}
-        follow={true}
-        lockX={false}
-        lockY={false}
-        lockZ={false}
-      >
-        <group scale={[textScale, textScale, textScale]}>
-          <Text
-            fontSize={size * 0.8}
-            color={glowColor}
-            outlineWidth={0.05}
-            outlineColor="#000000"
-            anchorX="center"
-            anchorY="middle"
-            material-transparent={true}
-            material-opacity={textOpacity}
-          >
-            {name}
-          </Text>
-        </group>
-      </Billboard>
       
       {/* Rings - for Saturn */}
       {hasRings && (
@@ -183,13 +188,243 @@ const Planet = ({
   );
 };
 
+const CameraController = ({ 
+  selectedPlanet, 
+  onZoomComplete 
+}: { 
+  selectedPlanet: string | null; 
+  onZoomComplete: (planet: string) => void 
+}) => {
+  const { camera } = useThree();
+  const zoomingComplete = useRef(false);
+  const zoomTimer = useRef<NodeJS.Timeout | null>(null);
+  
+  useEffect(() => {
+    if (!selectedPlanet) {
+      zoomingComplete.current = false;
+      if (zoomTimer.current) {
+        clearTimeout(zoomTimer.current);
+        zoomTimer.current = null;
+      }
+    }
+  }, [selectedPlanet]);
+  
+  useFrame(() => {
+    if (selectedPlanet) {
+      // Find the planet's position
+      const planetPositions: { [key: string]: [number, number, number] } = {
+        'Mercury': [-75, 45, -10],
+        'Venus': [70, 50, 0],
+        'Earth': [-60, -10, 5],
+        'Mars': [65, -15, -5],
+        'Jupiter': [-20, -50, 0],
+        'Saturn': [5, 0, 20],
+        'Uranus': [15, 55, 5],
+        'Neptune': [40, -45, -5]
+      };
+      
+      const targetPosition = planetPositions[selectedPlanet];
+      if (targetPosition) {
+        // Get closer to the planet but not too close
+        const zoomDistance = 10; // Very close zoom
+        const targetX = targetPosition[0];
+        const targetY = targetPosition[1];
+        const targetZ = targetPosition[2] + zoomDistance;
+        
+        // Smoothly move camera to planet
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX, 0.03);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, 0.03);
+        camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.03);
+        
+        // Look at the planet
+        camera.lookAt(targetPosition[0], targetPosition[1], targetPosition[2]);
+        
+        // Check if we're close enough to trigger surface view
+        const distance = Math.sqrt(
+          Math.pow(camera.position.x - targetX, 2) +
+          Math.pow(camera.position.y - targetY, 2) +
+          Math.pow(camera.position.z - targetZ, 2)
+        );
+        
+        if (distance < 0.5 && !zoomingComplete.current) {
+          zoomingComplete.current = true;
+          // Wait a bit before showing surface to allow the camera to settle
+          zoomTimer.current = setTimeout(() => {
+            onZoomComplete(selectedPlanet);
+          }, 500);
+        }
+      }
+    } else {
+      // Return to default position
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0, 0.02);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0, 0.02);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 160, 0.02);
+      camera.lookAt(0, 0, 0);
+    }
+  });
+
+  return null;
+};
+
+// Separate component for the landing alert
+const LandingAlert = ({ planet }: { planet: string | null }) => {
+  const [showAlert, setShowAlert] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (planet) {
+      // Show alert immediately
+      setShowAlert(true);
+      setMessage(`LANDING ON ${planet.toUpperCase()}`);
+      
+      // Hide after 3 seconds
+      const timer = setTimeout(() => {
+        setShowAlert(false);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    } else {
+      // Hide alert immediately when planet is deselected
+      setShowAlert(false);
+    }
+  }, [planet]);
+
+  if (!showAlert) return null;
+
+  return createPortal(
+    <div style={{
+      ...landingAlertStyles,
+      opacity: showAlert ? 1 : 0, // Ensure opacity is 1 when showing
+      animation: 'fadeIn 0.3s ease-in-out'
+    }}>
+      {message}
+    </div>,
+    document.body
+  );
+};
+
+// Surface component that shows the planet surface image
+const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () => void }) => {
+  const [surfaceImage, setSurfaceImage] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (!planet) {
+      setSurfaceImage(null);
+      return;
+    }
+    
+    // Map planet name to surface image
+    const surfaceImages: Record<string, string> = {
+      'Mercury': mercurySurface,
+      'Venus': venusSurface,
+      'Earth': earthSurface,
+      'Mars': marsSurface,
+      'Jupiter': jupiterSurface,
+      'Saturn': saturnSurface,
+      'Uranus': uranusSurface,
+      'Neptune': neptuneSurface
+    };
+    
+    setSurfaceImage(surfaceImages[planet] || null);
+  }, [planet]);
+  
+  if (!surfaceImage || !planet) return null;
+  
+  return createPortal(
+    <div 
+      style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        width: '100%', 
+        height: '100%',
+        zIndex: 1000,
+        backgroundColor: 'black',
+        animation: 'fadeIn 1s forwards'
+      }}
+      onClick={onClose}
+    >
+      <img 
+        src={surfaceImage} 
+        alt={`${planet} surface`} 
+        style={surfaceImageStyles}
+      />
+      
+      <div style={{
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        color: 'white',
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: '14px',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        padding: '10px',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        zIndex: 1001
+      }}>
+        Click anywhere to return
+      </div>
+      
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '20px',
+        color: 'white',
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: '18px',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        padding: '10px',
+        borderRadius: '5px',
+        zIndex: 1001
+      }}>
+        {planet.toUpperCase()} SURFACE
+      </div>
+    </div>,
+    document.body
+  );
+};
+
 export default function Scene() {
+  const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
+  const [showSurface, setShowSurface] = useState(false);
+  const [surfacePlanet, setSurfacePlanet] = useState<string | null>(null);
+
+  const handleZoomComplete = (planet: string) => {
+    setSurfacePlanet(planet);
+    setShowSurface(true);
+  };
+
+  const handleCloseSurface = () => {
+    setShowSurface(false);
+    setSurfacePlanet(null);
+    setSelectedPlanet(null);
+  };
+
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <Canvas camera={{ position: [0, 0, 160], fov: 50 }}>
+      {/* Add Orbitron font */}
+      <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+      
+      {/* Add keyframe animation for fade-in */}
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+        `}
+      </style>
+      
+      <Canvas camera={{ position: [0, 0, 160], fov: 45 }}> {/* Reduced FOV for better perspective */}
         <ambientLight intensity={0.6} />
         <pointLight position={[0, 0, 60]} intensity={2.5} color="#f8f0dd" />
         <directionalLight position={[10, 10, 5]} intensity={1.2} />
+        
+        <CameraController 
+          selectedPlanet={selectedPlanet} 
+          onZoomComplete={handleZoomComplete} 
+        />
         
         <Suspense fallback={null}>
           {/* Mercury */}
@@ -201,7 +436,8 @@ export default function Scene() {
             orbitRadius={2}
             orbitSpeed={0.005}
             glowColor="#f5f5f5"
-            name="Mercury"
+            isSelected={selectedPlanet === 'Mercury'}
+            onSelect={() => setSelectedPlanet(selectedPlanet === 'Mercury' ? null : 'Mercury')}
           />
           
           {/* Venus */}
@@ -213,7 +449,8 @@ export default function Scene() {
             orbitRadius={2}
             orbitSpeed={0.004}
             glowColor="#f8e8d0"
-            name="Venus"
+            isSelected={selectedPlanet === 'Venus'}
+            onSelect={() => setSelectedPlanet(selectedPlanet === 'Venus' ? null : 'Venus')}
           />
           
           {/* Earth */}
@@ -225,7 +462,8 @@ export default function Scene() {
             orbitRadius={2}
             orbitSpeed={0.003}
             glowColor="#a7d9f3"
-            name="Earth"
+            isSelected={selectedPlanet === 'Earth'}
+            onSelect={() => setSelectedPlanet(selectedPlanet === 'Earth' ? null : 'Earth')}
           />
           
           {/* Mars */}
@@ -237,7 +475,8 @@ export default function Scene() {
             orbitRadius={2}
             orbitSpeed={0.0025}
             glowColor="#f7a26c"
-            name="Mars"
+            isSelected={selectedPlanet === 'Mars'}
+            onSelect={() => setSelectedPlanet(selectedPlanet === 'Mars' ? null : 'Mars')}
           />
           
           {/* Jupiter */}
@@ -249,7 +488,8 @@ export default function Scene() {
             orbitRadius={2}
             orbitSpeed={0.0015}
             glowColor="#f3e6c4"
-            name="Jupiter"
+            isSelected={selectedPlanet === 'Jupiter'}
+            onSelect={() => setSelectedPlanet(selectedPlanet === 'Jupiter' ? null : 'Jupiter')}
           />
           
           {/* Saturn */}
@@ -264,7 +504,8 @@ export default function Scene() {
             ringTexture={saturnRingTexture}
             ringSize={[2.2, 4.0]}
             glowColor="#f8e8b0"
-            name="Saturn"
+            isSelected={selectedPlanet === 'Saturn'}
+            onSelect={() => setSelectedPlanet(selectedPlanet === 'Saturn' ? null : 'Saturn')}
           />
           
           {/* Uranus */}
@@ -276,7 +517,8 @@ export default function Scene() {
             orbitRadius={2}
             orbitSpeed={0.0008}
             glowColor="#b0e8f0"
-            name="Uranus"
+            isSelected={selectedPlanet === 'Uranus'}
+            onSelect={() => setSelectedPlanet(selectedPlanet === 'Uranus' ? null : 'Uranus')}
           />
           
           {/* Neptune */}
@@ -288,7 +530,8 @@ export default function Scene() {
             orbitRadius={2}
             orbitSpeed={0.0006}
             glowColor="#8080f0"
-            name="Neptune"
+            isSelected={selectedPlanet === 'Neptune'}
+            onSelect={() => setSelectedPlanet(selectedPlanet === 'Neptune' ? null : 'Neptune')}
           />
           
           <Stars radius={250} depth={60} count={8000} factor={4} saturation={0} fade />
@@ -296,6 +539,15 @@ export default function Scene() {
         
         <OrbitControls enableZoom={true} enablePan={true} />
       </Canvas>
+      
+      <LandingAlert planet={selectedPlanet} />
+      
+      {showSurface && surfacePlanet && (
+        <SurfaceView 
+          planet={surfacePlanet}
+          onClose={handleCloseSurface}
+        />
+      )}
     </div>
   );
 } 
