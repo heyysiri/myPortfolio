@@ -86,10 +86,10 @@ function useResponsiveSettings() {
   }, []);
   
   // Scale factor based on viewport size - increased to make planets larger
-  const scaleFactor = isMobile ? 1.2 : 1.5;
+  const scaleFactor = isMobile ? 0.8 : 1.0;
   
   // Adjusted position multiplier to spread planets out more
-  const positionMultiplier = isMobile ? 0.8 : 1.2;
+  const positionMultiplier = isMobile ? 0.7 : 1.0;
   
   return { scaleFactor, positionMultiplier, isMobile, viewport };
 }
@@ -572,10 +572,10 @@ export default function Scene() {
         />
         
         <Suspense fallback={null}>
-          {/* Mercury - increased size from 2.0 to 3.0 */}
+          {/* Mercury - decreased size from 3.0 to 2.5 */}
           <Planet 
             position={[-75, 45, -10]} 
-            size={3.0} 
+            size={2.5} 
             texture={mercuryTexture}
             rotationSpeed={0.015} 
             orbitRadius={2}
@@ -585,10 +585,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Mercury' ? null : 'Mercury')}
           />
           
-          {/* Venus - increased size from 2.4 to 3.6 */}
+          {/* Venus - decreased size from 3.6 to 2.8 */}
           <Planet 
             position={[70, 50, 0]} 
-            size={3.6} 
+            size={2.8} 
             texture={venusTexture}
             rotationSpeed={0.012} 
             orbitRadius={2}
@@ -598,10 +598,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Venus' ? null : 'Venus')}
           />
           
-          {/* Earth - increased size from 2.5 to 3.8 */}
+          {/* Earth - decreased size from 3.8 to 3.0 */}
           <Planet 
             position={[-60, -10, 5]} 
-            size={3.8} 
+            size={3.0} 
             texture={earthTexture}
             rotationSpeed={0.01} 
             orbitRadius={2}
@@ -611,10 +611,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Earth' ? null : 'Earth')}
           />
           
-          {/* Mars - increased size from 2.3 to 3.5 */}
+          {/* Mars - decreased size from 3.5 to 2.7 */}
           <Planet 
             position={[65, -15, -5]} 
-            size={3.5} 
+            size={2.7} 
             texture={marsTexture}
             rotationSpeed={0.009} 
             orbitRadius={2}
@@ -624,10 +624,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Mars' ? null : 'Mars')}
           />
           
-          {/* Jupiter - increased size from 4.5 to 6.5 */}
+          {/* Jupiter - decreased size from 6.5 to 4.8 */}
           <Planet 
             position={[-20, -50, 0]} 
-            size={6.5} 
+            size={4.8} 
             texture={jupiterTexture}
             rotationSpeed={0.007} 
             orbitRadius={2}
@@ -637,10 +637,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Jupiter' ? null : 'Jupiter')}
           />
           
-          {/* Saturn - increased size from 4.0 to 6.0 */}
+          {/* Saturn - decreased size from 6.0 to 4.5 */}
           <Planet 
             position={[5, 0, 20]} 
-            size={6.0} 
+            size={4.5} 
             texture={saturnTexture}
             rotationSpeed={0.006} 
             orbitRadius={2}
@@ -653,10 +653,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Saturn' ? null : 'Saturn')}
           />
           
-          {/* Uranus - increased size from 3.0 to 4.5 */}
+          {/* Uranus - decreased size from 4.5 to 3.5 */}
           <Planet 
             position={[15, 55, 5]} 
-            size={4.5} 
+            size={3.5} 
             texture={uranusTexture}
             rotationSpeed={0.005} 
             orbitRadius={2}
@@ -666,10 +666,10 @@ export default function Scene() {
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Uranus' ? null : 'Uranus')}
           />
           
-          {/* Neptune - increased size from 2.8 to 4.2 */}
+          {/* Neptune - decreased size from 4.2 to 3.2 */}
           <Planet 
             position={[40, -45, -5]} 
-            size={4.2} 
+            size={3.2} 
             texture={neptuneTexture}
             rotationSpeed={0.004} 
             orbitRadius={2}
