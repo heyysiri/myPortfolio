@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { TextureLoader } from 'three';
 import { useThree } from '@react-three/fiber';
 import { createPortal } from 'react-dom';
+import { ProjectCardsCarousel } from './ProjectCardsCarousel';
 
 // Create textures for different planets
 const mercuryTexture = '/textures/mercury.jpg';
@@ -441,13 +442,24 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         backgroundColor: 'black',
         animation: 'fadeIn 1s forwards'
       }}
-      onClick={onClose}
+      onClick={planet !== 'Mars' ? onClose : undefined}
     >
       <img 
         src={surfaceImage} 
         alt={`${planet} surface`} 
-        style={surfaceImageStyles}
+        style={{
+          ...surfaceImageStyles,
+          filter: planet === 'Mars' ? 'none' : undefined,
+          opacity: 1 // Ensure image is visible
+        }}
       />
+      
+      {/* Show project carousel only on Mars */}
+      {planet === 'Mars' && (
+        <div className="absolute inset-0 flex items-center justify-center z-[1005]">
+          <ProjectCardsCarousel />
+        </div>
+      )}
       
       <div style={{
         position: 'fixed',
@@ -461,8 +473,8 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         borderRadius: '5px',
         cursor: 'pointer',
         zIndex: 1001
-      }}>
-        Click anywhere to return
+      }} onClick={onClose}>
+        {planet === 'Mars' ? 'Exit Projects' : 'Click anywhere to return'}
       </div>
       
       <div style={{
@@ -477,7 +489,7 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         borderRadius: '5px',
         zIndex: 1001
       }}>
-        {planet.toUpperCase()} SURFACE
+        {planet === 'Mars' ? 'MY PROJECTS' : `${planet.toUpperCase()} SURFACE`}
       </div>
     </div>,
     document.body
@@ -529,7 +541,7 @@ export default function Scene() {
     setSurfacePlanet(null);
     setSelectedPlanet(null);
   };
-
+  
   return (
     <div style={{ width: '100%', height: '100%' }}>
       {/* Add Orbitron font */}
@@ -620,6 +632,7 @@ export default function Scene() {
             orbitRadius={2}
             orbitSpeed={0.0025}
             glowColor="#f7a26c"
+            glowIntensity={0.25} // Make Mars glow a bit more to highlight it
             isSelected={selectedPlanet === 'Mars'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Mars' ? null : 'Mars')}
           />
@@ -687,11 +700,57 @@ export default function Scene() {
       
       <LandingAlert planet={selectedPlanet} />
       
-      {showSurface && surfacePlanet && (
+      {showSurface && surfacePlanet && surfacePlanet !== 'Mars' && (
         <SurfaceView 
           planet={surfacePlanet}
           onClose={handleCloseSurface}
         />
+      )}
+      
+      {/* Special handling for Mars */}
+      {showSurface && surfacePlanet === 'Mars' && (
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%',
+            zIndex: 1000,
+            backgroundColor: 'black',
+            animation: 'fadeIn 1s forwards'
+          }}
+        >
+          <img 
+            src={marsSurface} 
+            alt="Mars surface" 
+            style={{
+              ...surfaceImageStyles,
+              opacity: 0.5,
+              filter: 'brightness(0.6) contrast(1.2) saturate(1.2)'
+            }}
+          />
+          
+          {/* Dark overlay for better contrast with projects */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 z-[1001]"></div>
+          
+          <div className="absolute inset-0 flex items-center justify-center z-[1005]">
+            <div className="w-full max-w-[1200px] mx-auto">
+              <ProjectCardsCarousel />
+            </div>
+          </div>
+          
+          <button
+            onClick={handleCloseSurface}
+            className="fixed top-4 right-4 bg-black/60 hover:bg-black/80 text-white px-5 py-2.5 rounded-full z-[1010] font-['Orbitron'] text-sm border border-white/20 hover:border-white/40 transition-all duration-300"
+          >
+            Exit Projects
+          </button>
+          
+          <div className="fixed bottom-4 left-4 bg-black/60 text-white px-5 py-2.5 rounded-full z-[1010] font-['Orbitron'] border border-white/20">
+            MY PROJECTS
+          </div>
+        </div>
       )}
     </div>
   );

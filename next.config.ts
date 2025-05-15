@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ['www.solarsystemscope.com'],
+    domains: ['www.solarsystemscope.com', 'images.unsplash.com'],
   },
   webpack(config) {
     // This enables proper handling of texture files in Three.js
