@@ -8,6 +8,8 @@ import { TextureLoader } from 'three';
 import { useThree } from '@react-three/fiber';
 import { createPortal } from 'react-dom';
 import { ProjectCardsCarousel } from './ProjectCardsCarousel';
+import AboutMe from './AboutMe';
+import { SkillsCards } from './SkillsCards';
 
 // Create textures for different planets
 const mercuryTexture = '/textures/mercury.jpg';
@@ -442,22 +444,41 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         backgroundColor: 'black',
         animation: 'fadeIn 1s forwards'
       }}
-      onClick={planet !== 'Mars' ? onClose : undefined}
+      onClick={planet !== 'Mars' && planet !== 'Earth' && planet !== 'Venus' ? onClose : undefined}
     >
       <img 
         src={surfaceImage} 
         alt={`${planet} surface`} 
         style={{
           ...surfaceImageStyles,
-          filter: planet === 'Mars' ? 'none' : undefined,
-          opacity: 1 // Ensure image is visible
+          filter: planet === 'Mars' ? 'none' : 'brightness(0.7)',
+          opacity: planet === 'Earth' || planet === 'Mars' || planet === 'Venus' ? 0.6 : 1
         }}
       />
+      
+      {/* Dark overlay for Earth, Mars and Venus */}
+      {(planet === 'Earth' || planet === 'Mars' || planet === 'Venus') && (
+        <div className="absolute inset-0 bg-black/50 z-[1001]"></div>
+      )}
       
       {/* Show project carousel only on Mars */}
       {planet === 'Mars' && (
         <div className="absolute inset-0 flex items-center justify-center z-[1005]">
           <ProjectCardsCarousel />
+        </div>
+      )}
+      
+      {/* Show AboutMe component on Earth */}
+      {planet === 'Earth' && (
+        <div className="absolute inset-0 flex items-center justify-center z-[1005]">
+          <AboutMe />
+        </div>
+      )}
+      
+      {/* Show SkillsCards component on Venus */}
+      {planet === 'Venus' && (
+        <div className="absolute inset-0 flex items-center justify-center z-[1005]">
+          <SkillsCards />
         </div>
       )}
       
@@ -472,9 +493,9 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         padding: '10px',
         borderRadius: '5px',
         cursor: 'pointer',
-        zIndex: 1001
+        zIndex: 1010
       }} onClick={onClose}>
-        {planet === 'Mars' ? 'Exit Projects' : 'Click anywhere to return'}
+        {planet === 'Mars' ? 'Exit Projects' : planet === 'Earth' ? 'Exit About Me' : planet === 'Venus' ? 'Exit Skills' : 'Click anywhere to return'}
       </div>
       
       <div style={{
@@ -487,9 +508,9 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         padding: '10px',
         borderRadius: '5px',
-        zIndex: 1001
+        zIndex: 1010
       }}>
-        {planet === 'Mars' ? 'MY PROJECTS' : `${planet.toUpperCase()} SURFACE`}
+        {planet === 'Mars' ? 'MY PROJECTS' : planet === 'Earth' ? 'ABOUT ME' : planet === 'Venus' ? 'MY SKILLS' : `${planet.toUpperCase()} SURFACE`}
       </div>
     </div>,
     document.body
