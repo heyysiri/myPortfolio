@@ -51,7 +51,7 @@ export const SkillsCards = () => {
   return (
     <DraggableCardContainer className="relative min-h-screen w-full">
       <p className="absolute top-[5%] left-0 right-0 mx-auto text-center text-3xl font-black text-white z-10">
-        Drag My Skills
+        Explore My Technical Skills
       </p>
       <div className="absolute inset-0">
         {skills.map((skill, index) => (

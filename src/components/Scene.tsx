@@ -10,6 +10,7 @@ import { createPortal } from 'react-dom';
 import { ProjectCardsCarousel } from './ProjectCardsCarousel';
 import AboutMe from './AboutMe';
 import { SkillsCards } from './SkillsCards';
+import JupiterAchievements from './JupiterAchievements';
 
 // Create textures for different planets
 const mercuryTexture = '/textures/mercury.jpg';
@@ -444,7 +445,7 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         backgroundColor: 'black',
         animation: 'fadeIn 1s forwards'
       }}
-      onClick={planet !== 'Mars' && planet !== 'Earth' && planet !== 'Venus' ? onClose : undefined}
+      onClick={planet !== 'Mars' && planet !== 'Earth' && planet !== 'Venus' && planet !== 'Jupiter' ? onClose : undefined}
     >
       <img 
         src={surfaceImage} 
@@ -482,6 +483,13 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         </div>
       )}
       
+      {/* Show JupiterAchievements component on Jupiter */}
+      {planet === 'Jupiter' && (
+        <div className="absolute inset-0 flex items-center justify-center z-[1005]">
+          <JupiterAchievements />
+        </div>
+      )}
+      
       <div style={{
         position: 'fixed',
         top: '20px',
@@ -495,7 +503,7 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         cursor: 'pointer',
         zIndex: 1010
       }} onClick={onClose}>
-        {planet === 'Mars' ? 'Exit Projects' : planet === 'Earth' ? 'Exit About Me' : planet === 'Venus' ? 'Exit Skills' : 'Click anywhere to return'}
+        {planet === 'Mars' ? 'Exit Projects' : planet === 'Earth' ? 'Exit About Me' : planet === 'Venus' ? 'Exit Skills' : planet === 'Jupiter' ? 'Exit Achievements' : 'Click anywhere to return'}
       </div>
       
       <div style={{
@@ -510,7 +518,7 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         borderRadius: '5px',
         zIndex: 1010
       }}>
-        {planet === 'Mars' ? 'MY PROJECTS' : planet === 'Earth' ? 'ABOUT ME' : planet === 'Venus' ? 'MY SKILLS' : `${planet.toUpperCase()} SURFACE`}
+        {planet === 'Mars' ? 'MY PROJECTS' : planet === 'Earth' ? 'ABOUT ME' : planet === 'Venus' ? 'MY SKILLS' : planet === 'Jupiter' ? 'MY ACHIEVEMENTS' : `${planet.toUpperCase()} SURFACE`}
       </div>
     </div>,
     document.body

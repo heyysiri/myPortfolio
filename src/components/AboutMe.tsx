@@ -15,12 +15,6 @@ export default function AboutMe() {
   const [isCamelClicked, setIsCamelClicked] = useState(false);
 
   useEffect(() => {
-    // Add Google fonts for variable font
-    const linkElement = document.createElement('link');
-    linkElement.rel = 'stylesheet';
-    linkElement.href = 'https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400..1000&family=Playfair+Display:wght@400..900&display=swap';
-    document.head.appendChild(linkElement);
-
     // Animation on mount
     setIsVisible(true);
 
@@ -30,7 +24,6 @@ export default function AboutMe() {
     }, 4000);
 
     return () => {
-      document.head.removeChild(linkElement);
       clearTimeout(popupTimer);
     };
   }, []);
@@ -116,7 +109,7 @@ export default function AboutMe() {
             exit="exit"
             variants={popupVariants}
           >
-            <p className="font-['Playfair_Display'] text-lg">My camel has run away! Can you spot it in this vast desert?</p>
+            <p style={{ fontFamily: 'var(--font-orbitron)' }} className="text-lg">My camel has run away! Can you spot it in this vast desert?</p>
           </motion.div>
         )}
 
@@ -128,7 +121,7 @@ export default function AboutMe() {
             exit="exit"
             variants={popupVariants}
           >
-            <p className="font-['Playfair_Display'] text-lg">Thank you, I'll be coming to get it!</p>
+            <p style={{ fontFamily: 'var(--font-orbitron)' }} className="text-lg">Thank you, I'll be coming to get it!</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -145,7 +138,8 @@ export default function AboutMe() {
         >
           <VariableProximity
             label="Siri Karra"
-            className="text-4xl md:text-6xl font-bold text-white tracking-tight font-['Playfair_Display']"
+            className="text-4xl md:text-6xl font-bold text-white tracking-tight"
+            style={{ fontFamily: 'var(--font-orbitron)' }}
             fromFontVariationSettings="'wght' 400, 'opsz' 14"
             toFontVariationSettings="'wght' 900, 'opsz' 40"
             containerRef={nameContainerRef}
@@ -153,7 +147,7 @@ export default function AboutMe() {
             falloff="exponential"
           />
         </div>
-        <h2 className="text-xl md:text-2xl mt-4 text-blue-300 font-['Playfair_Display']">Full-Stack Developer & Space Enthusiast</h2>
+        <h2 className="text-xl md:text-2xl mt-4 text-blue-300" style={{ fontFamily: 'var(--font-orbitron)' }}>Full-Stack Developer & Space Enthusiast</h2>
       </motion.div>
 
       <motion.div 
@@ -168,7 +162,8 @@ export default function AboutMe() {
         >
           <VariableProximity
             label="Welcome to my cosmic portfolio! I'm a passionate developer with expertise in creating immersive web experiences. My journey in the digital universe revolves around building innovative applications that combine cutting-edge technology with intuitive design."
-            className="text-xl text-white/90 font-['Playfair_Display']"
+            className="text-xl text-white/90"
+            style={{ fontFamily: 'var(--font-orbitron)' }}
             fromFontVariationSettings="'wght' 300, 'opsz' 12"
             toFontVariationSettings="'wght' 800, 'opsz' 32"
             containerRef={bio1ContainerRef}
@@ -183,7 +178,8 @@ export default function AboutMe() {
         >
           <VariableProximity
             label="When I'm not coding, you can find me stargazing, exploring the latest in astrophysics, or diving into science fiction that expands the imagination about what's possible in our universe."
-            className="text-xl text-white/90 font-['Playfair_Display']"
+            className="text-xl text-white/90"
+            style={{ fontFamily: 'var(--font-orbitron)' }}
             fromFontVariationSettings="'wght' 300, 'opsz' 12"
             toFontVariationSettings="'wght' 800, 'opsz' 32"
             containerRef={bio2ContainerRef}
