@@ -126,17 +126,25 @@ const Planet = ({
   glowColor = "#ffffff",
   glowIntensity = 0.15,
   isSelected,
-  onSelect
-}: PlanetProps & { isSelected: boolean; onSelect: () => void }) => {
+  onSelect,
+  onHover
+}: PlanetProps & { isSelected: boolean; onSelect: () => void; onHover: (isHovered: boolean, worldPosition: THREE.Vector3) => void }) => {
   const planetRef = useRef<THREE.Mesh>(null);
   const ringsRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const initialPosition = useRef<[number, number, number]>(position);
   const time = useRef(Math.random() * 100);
+  const [isHovered, setIsHovered] = useState(false);
+  const planetNameRef = useRef('');
   
   // Get responsive settings
   const { scaleFactor, positionMultiplier } = useResponsiveSettings();
+  
+  // Load textures - always call hooks at the top level
+  const planetTexture = useLoader(TextureLoader, texture);
+  // Always load ringTexture (or fallback) to avoid conditional hook calls
+  const ringTextureObject = useLoader(TextureLoader, ringTexture || texture);
   
   // Adjust position based on responsiveness
   const responsivePosition: [number, number, number] = [
@@ -145,18 +153,29 @@ const Planet = ({
     position[2] * positionMultiplier
   ];
   
-  // Adjust size based on responsiveness
-  const responsiveSize = size * scaleFactor;
-  
-  // Load texture properly - always call hook at the top level
-  const planetTexture = useLoader(TextureLoader, texture);
-  // Always call useLoader at the top level with a fallback texture
-  const ringTextureObject = useLoader(TextureLoader, ringTexture || texture);
-  
   useEffect(() => {
     // Update initial position when responsive values change
     initialPosition.current = responsivePosition;
   }, [responsivePosition]);
+
+  // Determine planet name based on its position
+  useEffect(() => {
+    // Map positions to planet names (using the initial, non-responsive positions)
+    const positionMap: Record<string, string> = {
+      '-75,45,-10': 'Mercury',
+      '70,50,0': 'Venus',
+      '-60,-10,5': 'Earth',
+      '65,-15,-5': 'Mars',
+      '-20,-50,0': 'Jupiter',
+      '5,0,20': 'Saturn',
+      '15,55,5': 'Uranus',
+      '40,-45,-5': 'Neptune'
+    };
+    
+    // Create position key
+    const posKey = `${position[0]},${position[1]},${position[2]}`;
+    planetNameRef.current = positionMap[posKey] || "";
+  }, [position]);
   
   useFrame((state, delta) => {
     if (planetRef.current) {
@@ -190,11 +209,11 @@ const Planet = ({
     <group ref={groupRef} position={responsivePosition}>
       {/* Subtle glow effect */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[responsiveSize * 1.2, 32, 32]} />
+        <sphereGeometry args={[size * scaleFactor * 1.2, 32, 32]} />
         <meshBasicMaterial 
           color={glowColor} 
           transparent={true} 
-          opacity={isSelected ? glowIntensity * 2 : glowIntensity}
+          opacity={isSelected ? glowIntensity * 2 : isHovered ? glowIntensity * 1.5 : glowIntensity}
           side={THREE.BackSide}
         />
       </mesh>
@@ -205,8 +224,16 @@ const Planet = ({
         castShadow 
         receiveShadow
         onClick={onSelect}
+        onPointerOver={(event) => {
+          setIsHovered(true);
+          onHover(true, event.point);
+        }}
+        onPointerOut={() => {
+          setIsHovered(false);
+          onHover(false, new THREE.Vector3());
+        }}
       >
-        <sphereGeometry args={[responsiveSize, 64, 64]} />
+        <sphereGeometry args={[size * scaleFactor, 64, 64]} />
         <meshStandardMaterial 
           map={planetTexture} 
           metalness={0.4}
@@ -221,10 +248,10 @@ const Planet = ({
           rotation={[Math.PI / 2.5, 0, 0]}
           position={[0, 0, 0]}
         >
-          <ringGeometry args={[responsiveSize * ringSize[0], responsiveSize * ringSize[1], 128]} />
+          <ringGeometry args={[size * scaleFactor * ringSize[0], size * scaleFactor * ringSize[1], 128]} />
           <meshStandardMaterial 
             color="#ffffff"
-            map={ringTexture ? ringTextureObject : null}
+            map={ringTextureObject}
             side={THREE.DoubleSide} 
             transparent={true}
             opacity={1}
@@ -236,6 +263,8 @@ const Planet = ({
           />
         </mesh>
       )}
+
+
     </group>
   );
 };
@@ -577,6 +606,7 @@ export default function Scene() {
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
   const [showSurface, setShowSurface] = useState(false);
   const [surfacePlanet, setSurfacePlanet] = useState<string | null>(null);
+  const [hoveredPlanet, setHoveredPlanet] = useState<{ name: string; position: { x: number, y: number } } | null>(null);
 
   const handleZoomComplete = (planet: string) => {
     setSurfacePlanet(planet);
@@ -587,6 +617,38 @@ export default function Scene() {
     setShowSurface(false);
     setSurfacePlanet(null);
     setSelectedPlanet(null);
+  };
+  
+  // Function to handle planet hover
+  const handlePlanetHover = (isHovered: boolean, worldPosition: THREE.Vector3, planetName: string) => {
+    if (isHovered && !selectedPlanet) {
+      // Use the current mouse position
+      const mousePosition = {
+        x: (window.event as MouseEvent)?.clientX || window.innerWidth / 2,
+        y: (window.event as MouseEvent)?.clientY || window.innerHeight / 2
+      };
+      setHoveredPlanet({ name: planetName, position: mousePosition });
+    } else if (!isHovered && hoveredPlanet?.name === planetName) {
+      setHoveredPlanet(null);
+    }
+  };
+  
+  // Get planet hover label content
+  const getTooltipContent = (planetName: string) => {
+    switch (planetName) {
+      case 'Earth':
+        return 'About Me';
+      case 'Mars':
+        return 'Projects';
+      case 'Venus':
+        return 'Skills';
+      case 'Jupiter':
+        return '🏆 🎓'; // Trophy and certificate emojis
+      case 'Mercury':
+        return 'Contact';
+      default:
+        return 'Hello!'; // For Saturn, Uranus, Neptune
+    }
   };
   
   return (
@@ -642,6 +704,9 @@ export default function Scene() {
             glowColor="#f5f5f5"
             isSelected={selectedPlanet === 'Mercury'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Mercury' ? null : 'Mercury')}
+            onHover={(isHovered, worldPosition) => {
+              handlePlanetHover(isHovered, worldPosition, 'Mercury');
+            }}
           />
           
           {/* Venus - decreased size from 3.6 to 2.8 */}
@@ -655,6 +720,9 @@ export default function Scene() {
             glowColor="#f8e8d0"
             isSelected={selectedPlanet === 'Venus'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Venus' ? null : 'Venus')}
+            onHover={(isHovered, worldPosition) => {
+              handlePlanetHover(isHovered, worldPosition, 'Venus');
+            }}
           />
           
           {/* Earth - decreased size from 3.8 to 3.0 */}
@@ -668,6 +736,9 @@ export default function Scene() {
             glowColor="#a7d9f3"
             isSelected={selectedPlanet === 'Earth'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Earth' ? null : 'Earth')}
+            onHover={(isHovered, worldPosition) => {
+              handlePlanetHover(isHovered, worldPosition, 'Earth');
+            }}
           />
           
           {/* Mars - decreased size from 3.5 to 2.7 */}
@@ -682,6 +753,9 @@ export default function Scene() {
             glowIntensity={0.25} // Make Mars glow a bit more to highlight it
             isSelected={selectedPlanet === 'Mars'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Mars' ? null : 'Mars')}
+            onHover={(isHovered, worldPosition) => {
+              handlePlanetHover(isHovered, worldPosition, 'Mars');
+            }}
           />
           
           {/* Jupiter - decreased size from 6.5 to 4.8 */}
@@ -695,6 +769,9 @@ export default function Scene() {
             glowColor="#f3e6c4"
             isSelected={selectedPlanet === 'Jupiter'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Jupiter' ? null : 'Jupiter')}
+            onHover={(isHovered, worldPosition) => {
+              handlePlanetHover(isHovered, worldPosition, 'Jupiter');
+            }}
           />
           
           {/* Saturn - decreased size from 6.0 to 4.5 */}
@@ -711,6 +788,9 @@ export default function Scene() {
             glowColor="#f8e8b0"
             isSelected={selectedPlanet === 'Saturn'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Saturn' ? null : 'Saturn')}
+            onHover={(isHovered, worldPosition) => {
+              handlePlanetHover(isHovered, worldPosition, 'Saturn');
+            }}
           />
           
           {/* Uranus - decreased size from 4.5 to 3.5 */}
@@ -724,6 +804,9 @@ export default function Scene() {
             glowColor="#b0e8f0"
             isSelected={selectedPlanet === 'Uranus'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Uranus' ? null : 'Uranus')}
+            onHover={(isHovered, worldPosition) => {
+              handlePlanetHover(isHovered, worldPosition, 'Uranus');
+            }}
           />
           
           {/* Neptune - decreased size from 4.2 to 3.2 */}
@@ -737,6 +820,9 @@ export default function Scene() {
             glowColor="#8080f0"
             isSelected={selectedPlanet === 'Neptune'}
             onSelect={() => setSelectedPlanet(selectedPlanet === 'Neptune' ? null : 'Neptune')}
+            onHover={(isHovered, worldPosition) => {
+              handlePlanetHover(isHovered, worldPosition, 'Neptune');
+            }}
           />
           
           <Stars radius={250} depth={60} count={8000} factor={4} saturation={0} fade />
@@ -746,6 +832,32 @@ export default function Scene() {
       </ResponsiveCanvasWrapper>
       
       <LandingAlert planet={selectedPlanet} />
+      
+      {/* Planet Hover Label - outside of Canvas context */}
+      {hoveredPlanet && !selectedPlanet && (
+        <div
+          style={{
+            position: 'absolute',
+            left: `${hoveredPlanet.position.x}px`,
+            top: `${hoveredPlanet.position.y - 30}px`,
+            transform: 'translate(-50%, -100%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            color: 'white',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            fontFamily: 'var(--font-orbitron)',
+            fontSize: '14px',
+            zIndex: 1000,
+            pointerEvents: 'none',
+            textShadow: '0 0 10px rgba(100, 200, 255, 0.8)',
+            boxShadow: '0 0 15px rgba(100, 200, 255, 0.3)',
+            border: '1px solid rgba(100, 200, 255, 0.5)',
+            opacity: 0.9,
+          }}
+        >
+          {getTooltipContent(hoveredPlanet.name)}
+        </div>
+      )}
       
       {showSurface && surfacePlanet && surfacePlanet !== 'Mars' && (
         <SurfaceView 
