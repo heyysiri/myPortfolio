@@ -11,6 +11,7 @@ import { ProjectCardsCarousel } from './ProjectCardsCarousel';
 import AboutMe from './AboutMe';
 import { SkillsCards } from './SkillsCards';
 import JupiterAchievements from './JupiterAchievements';
+import ContactForm from './ContactForm';
 
 // Create textures for different planets
 const mercuryTexture = '/textures/mercury.jpg';
@@ -445,7 +446,7 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         backgroundColor: 'black',
         animation: 'fadeIn 1s forwards'
       }}
-      onClick={planet !== 'Mars' && planet !== 'Earth' && planet !== 'Venus' && planet !== 'Jupiter' ? onClose : undefined}
+      onClick={planet !== 'Mars' && planet !== 'Earth' && planet !== 'Venus' && planet !== 'Jupiter' && planet !== 'Mercury' ? onClose : undefined}
     >
       <img 
         src={surfaceImage} 
@@ -453,12 +454,12 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         style={{
           ...surfaceImageStyles,
           filter: planet === 'Mars' ? 'none' : 'brightness(0.7)',
-          opacity: planet === 'Earth' || planet === 'Mars' || planet === 'Venus' ? 0.6 : 1
+          opacity: planet === 'Earth' || planet === 'Mars' || planet === 'Venus' || planet === 'Mercury' ? 0.6 : 1
         }}
       />
       
       {/* Dark overlay for Earth, Mars and Venus */}
-      {(planet === 'Earth' || planet === 'Mars' || planet === 'Venus') && (
+      {(planet === 'Earth' || planet === 'Mars' || planet === 'Venus' || planet === 'Mercury') && (
         <div className="absolute inset-0 bg-black/50 z-[1001]"></div>
       )}
       
@@ -490,6 +491,13 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         </div>
       )}
       
+      {/* Show ContactForm component on Mercury */}
+      {planet === 'Mercury' && (
+        <div className="absolute inset-0 flex items-center justify-center z-[1005] px-4 sm:px-6 py-8">
+          <ContactForm />
+        </div>
+      )}
+      
       <div style={{
         position: 'fixed',
         top: '20px',
@@ -503,7 +511,12 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         cursor: 'pointer',
         zIndex: 1010
       }} onClick={onClose}>
-        {planet === 'Mars' ? 'Exit Projects' : planet === 'Earth' ? 'Exit About Me' : planet === 'Venus' ? 'Exit Skills' : planet === 'Jupiter' ? 'Exit Achievements' : 'Click anywhere to return'}
+        {planet === 'Mars' ? 'Exit Projects' : 
+         planet === 'Earth' ? 'Exit About Me' : 
+         planet === 'Venus' ? 'Exit Skills' : 
+         planet === 'Jupiter' ? 'Exit Achievements' : 
+         planet === 'Mercury' ? 'Exit Contact' : 
+         'Click anywhere to return'}
       </div>
       
       <div style={{
@@ -518,7 +531,12 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         borderRadius: '5px',
         zIndex: 1010
       }}>
-        {planet === 'Mars' ? 'MY PROJECTS' : planet === 'Earth' ? 'ABOUT ME' : planet === 'Venus' ? 'MY SKILLS' : planet === 'Jupiter' ? 'MY ACHIEVEMENTS' : `${planet.toUpperCase()} SURFACE`}
+        {planet === 'Mars' ? 'MY PROJECTS' : 
+         planet === 'Earth' ? 'ABOUT ME' : 
+         planet === 'Venus' ? 'MY SKILLS' : 
+         planet === 'Jupiter' ? 'MY ACHIEVEMENTS' : 
+         planet === 'Mercury' ? 'CONTACT ME' : 
+         `${planet.toUpperCase()} SURFACE`}
       </div>
     </div>,
     document.body

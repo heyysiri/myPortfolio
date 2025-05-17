@@ -34,8 +34,6 @@ export const MovingBorder = ({
     const startTime = Date.now();
     
     const animate = () => {
-      if (isHovering.current) return;
-      
       const elapsed = Date.now() - startTime;
       const angle = (elapsed * 0.0005) % (Math.PI * 2); // Complete rotation every ~12.5 seconds
       
@@ -60,11 +58,6 @@ export const MovingBorder = ({
     if (!containerRef.current) return;
     
     isHovering.current = true;
-    
-    const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - left) / width;
-    const y = (e.clientY - top) / height;
-    setPosition({ x, y });
   };
 
   const handleMouseLeave = () => {

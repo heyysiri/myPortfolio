@@ -41,7 +41,7 @@ export default function JupiterAchievements() {
   ];
 
   return (
-    <div className="w-full max-w-6xl px-6 py-12 mx-auto">
+    <div className="w-full max-w-6xl mx-auto px-8 sm:px-10 md:px-12 lg:px-16 py-12">
       {/* <h1 className="text-center text-4xl mb-12 text-white" style={{ fontFamily: 'var(--font-orbitron)' }}>
         ACHIEVEMENTS & CERTIFICATIONS
       </h1> */}
