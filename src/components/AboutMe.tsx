@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import VariableProximity from './VariableProximity';
+import VariableProximity from './ui/VariableProximity';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AboutMe() {
@@ -137,7 +137,7 @@ export default function AboutMe() {
           className="relative inline-block"
         >
           <VariableProximity
-            label="Siri Karra"
+            label="Hello, I'm Siri Karra"
             className="text-4xl md:text-6xl font-bold text-white tracking-tight"
             style={{ fontFamily: 'var(--font-orbitron)' }}
             fromFontVariationSettings="'wght' 400, 'opsz' 14"
@@ -147,7 +147,7 @@ export default function AboutMe() {
             falloff="exponential"
           />
         </div>
-        <h2 className="text-xl md:text-2xl mt-4 text-blue-300" style={{ fontFamily: 'var(--font-orbitron)' }}>Full-Stack Developer & Space Enthusiast</h2>
+        <h2 className="text-xl md:text-2xl mt-4 text-blue-300" style={{ fontFamily: 'var(--font-orbitron)' }}>Full-Stack Developer & AI Enthusiast</h2>
       </motion.div>
 
       <motion.div 
@@ -161,7 +161,10 @@ export default function AboutMe() {
           className="relative"
         >
           <VariableProximity
-            label="Welcome to my cosmic portfolio! I'm a passionate developer with expertise in creating immersive web experiences. My journey in the digital universe revolves around building innovative applications that combine cutting-edge technology with intuitive design."
+            label="Hi! I’m a 3rd-year Computer Science undergraduate with a strong passion for building meaningful things on the web and a growing curiosity in the world of AI.
+Beyond tech, I’m a huge Potterhead, a music enthusiast, and an avid chess player who enjoys a good strategic challenge — both on and off the board.
+
+I’m always up for learning something new, collaborating on exciting projects, and turning ideas into impact."
             className="text-xl text-white/90"
             style={{ fontFamily: 'var(--font-orbitron)' }}
             fromFontVariationSettings="'wght' 300, 'opsz' 12"
@@ -177,7 +180,7 @@ export default function AboutMe() {
           className="relative"
         >
           <VariableProximity
-            label="When I'm not coding, you can find me stargazing, exploring the latest in astrophysics, or diving into science fiction that expands the imagination about what's possible in our universe."
+            label=""
             className="text-xl text-white/90"
             style={{ fontFamily: 'var(--font-orbitron)' }}
             fromFontVariationSettings="'wght' 300, 'opsz' 12"
@@ -294,7 +297,7 @@ export default function AboutMe() {
         <div className="flex justify-center items-center gap-20">
           {/* GitHub Icon */}
           <a 
-            href="https://google.com" 
+            href="https://github.com/heyysiri" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center w-14 h-14 bg-gray-800 hover:bg-gray-700 text-white rounded-full transition-colors duration-300"
@@ -307,7 +310,7 @@ export default function AboutMe() {
           
           {/* LinkedIn Icon */}
           <a 
-            href="https://google.com" 
+            href="https://www.linkedin.com/in/siri-karra/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors duration-300"

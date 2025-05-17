@@ -2,50 +2,87 @@ import React from "react";
 import {
   DraggableCardBody,
   DraggableCardContainer,
-} from "@/components/draggable-card";
+} from "@/components/ui/draggable-card";
 
 export const SkillsCards = () => {
   const skills = [
     {
-      title: "React",
-      className: "absolute left-[20%] top-[30%] rotate-[-8deg]",
+      title: "React.js",
+      className: "absolute left-[10%] top-[15%] rotate-[-8deg]",
     },
     {
       title: "Next.js",
-      className: "absolute left-[40%] top-[20%] rotate-[5deg]",
+      className: "absolute left-[35%] top-[12%] rotate-[5deg]",
     },
     {
       title: "TypeScript",
-      className: "absolute left-[60%] top-[35%] rotate-[-5deg]",
+      className: "absolute left-[60%] top-[18%] rotate-[-5deg]",
     },
     {
-      title: "Three.js",
-      className: "absolute left-[25%] top-[50%] rotate-[10deg]",
+      title: "Python",
+      className: "absolute left-[85%] top-[15%] rotate-[10deg]",
     },
     {
       title: "TailwindCSS",
-      className: "absolute left-[65%] top-[65%] rotate-[-12deg]",
+      className: "absolute left-[15%] top-[35%] rotate-[-12deg]",
     },
     {
-      title: "Node.js",
-      className: "absolute left-[45%] top-[55%] rotate-[8deg]",
+      title: "Flutter",
+      className: "absolute left-[40%] top-[35%] rotate-[8deg]",
     },
     {
-      title: "GraphQL",
-      className: "absolute left-[15%] top-[70%] rotate-[15deg]",
+      title: "MySQL",
+      className: "absolute left-[65%] top-[38%] rotate-[15deg]",
     },
     {
       title: "JavaScript",
-      className: "absolute left-[75%] top-[40%] rotate-[-15deg]",
+      className: "absolute left-[88%] top-[35%] rotate-[-15deg]",
     },
     {
       title: "MongoDB",
-      className: "absolute left-[30%] top-[80%] rotate-[4deg]",
+      className: "absolute left-[12%] top-[55%] rotate-[4deg]",
+    },
+    {
+      title: "SQLite",
+      className: "absolute left-[37%] top-[58%] rotate-[-10deg]",
+    },
+    {
+      title: "Node.js",
+      className: "absolute left-[62%] top-[58%] rotate-[12deg]",
+    },
+    {
+      title: "Java",
+      className: "absolute left-[85%] top-[55%] rotate-[18deg]",
+    },
+    {
+      title: "Express.js",
+      className: "absolute left-[18%] top-[75%] rotate-[15deg]",
+    },
+    {
+      title: "Flask",
+      className: "absolute left-[45%] top-[78%] rotate-[7deg]",
+    },
+    {
+      title: "Linux",
+      className: "absolute left-[70%] top-[75%] rotate-[10deg]",
+    },
+    {
+      title: "Windows",
+      className: "absolute left-[10%] top-[90%] rotate-[-5deg]",
+    },
+    {
+      title: "Git/Github",
+      className: "absolute left-[35%] top-[90%] rotate-[-8deg]",
+    },
+    {
+      title: "Docker",
+      className: "absolute left-[60%] top-[90%] rotate-[10deg]",
     },
     {
       title: "AWS",
-      className: "absolute left-[80%] top-[25%] rotate-[-10deg]",
+      className: "absolute left-[85%] top-[90%] rotate-[-12deg]",
     },
+    
   ];
 
   return (

@@ -9,35 +9,43 @@ interface ProjectData {
 
 export const projectsData: ProjectData[] = [
   {
-    title: "Portfolio Website",
-    description: "A personal portfolio website showcasing my projects, skills, and experience with interactive 3D elements and space theme.",
-    technologies: ["Next.js", "TypeScript", "Three.js", "TailwindCSS"],
-    link: "https://siri-karra.vercel.app/",
-    previewImage: "https://images.unsplash.com/photo-1545235617-9465d2a55698?q=80&w=1000",
+    title: "Forget-Me-Not - Smart Reminder plugin",
+    description: "Developed a plugin within the Screenpipe ecosystem that tracks app usage and helps users stay on top of unfinished tasks with timely, intelligent reminders",
+    technologies: ["Next.js", "Typescript", "TailwindCSS", "shadcn/ui"],
+    link: "https://github.com/heyysiri/Forget-Me-Not",
+    previewImage: "/project_images/FMN.jpg",
     bgColor: "from-indigo-500 to-purple-600"
   },
   {
-    title: "AR Interior Design App",
-    description: "An augmented reality application that allows users to visualize furniture and décor in their space before purchasing.",
-    technologies: ["React Native", "ARKit", "ARCore", "JavaScript"],
-    link: "https://siri-karra.vercel.app/",
-    previewImage: "https://images.unsplash.com/photo-1600585154363-67eb9e2e2099?q=80&w=1000",
+    title: "GenAI Remote Sensing",
+    description: "Created an AI-driven solution for environmental and agricultural challenges, using cutting-edge deep learning models to enhance crop classification, flood detection, and SAR image colorization. A game-changing approach for remote sensing!",
+    technologies: ["Flutter", "Flask", "Deep Learning Models", "Docker"],
+    link: "https://github.com/heyysiri/genai-remote-sensing",
+    previewImage: "/project_images/SAR.png",
+    bgColor: "from-indigo-500 to-purple-600"
+  },
+  {
+    title: "SKANA - Skill Gap Analyzer and Upskill Recommendation Tool",
+    description: "Developed a tool to connect job seekers' skills with market demands, offering personalized upskilling paths and seamless job placement support with a responsive frontend and scalable backend.",
+    technologies: ["React.js", "TailwindCSS", "Flask", "MongoDB"],
+    link: "https://github.com/heyysiri/SKANA",
+    previewImage: "/project_images/SKANA.png",
     bgColor: "from-blue-500 to-cyan-500"
   },
   {
-    title: "Smart Home Dashboard",
-    description: "A centralized dashboard to control smart home devices with beautiful UI and real-time monitoring capabilities.",
-    technologies: ["React", "Redux", "Node.js", "WebSockets"],
-    link: "https://siri-karra.vercel.app/",
-    previewImage: "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+    title: "AI/ML powered chatbot for Namami Gange Programme",
+    description: "Led the development of an AI-powered chatbot designed to inform and educate the public about the Namami Gange Programme, leveraging Rasa for NLP and enhancing response accuracy for a smoother user experience",
+    technologies: ["React", "Rasa", "SQLite", "CSS"],
+    link: "https://github.com/heyysiri/NamamiGange",
+    previewImage: "/project_images/NG.png",
     bgColor: "from-green-500 to-teal-500"
   },
   {
-    title: "AI Content Generator",
-    description: "An AI-powered tool that generates customized content for various platforms based on user preferences and trends.",
-    technologies: ["Python", "TensorFlow", "FastAPI", "React"],
-    link: "https://siri-karra.vercel.app/",
-    previewImage: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000",
+    title: "Retro Harry Potter fansite",
+    description: "Being the Potterhead that I am, I created a retro-inspired Harry Potter fan site featuring a mini-game, spell cards, and character cards, all wrapped in a nostalgic, magical vibe. A perfect treat for fellow wizards and witches!",
+    technologies: ["React", "TailwindCSS"],
+    link: "https://github.com/heyysiri/Arcade-Of-Azkaban",
+    previewImage: "/project_images/HP.png",
     bgColor: "from-rose-500 to-orange-500"
   }
 ]; 

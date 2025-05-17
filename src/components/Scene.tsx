@@ -34,6 +34,25 @@ const saturnSurface = '/surfaces/saturn.jpg';
 const uranusSurface = '/surfaces/uranus.jpg';
 const neptuneSurface = '/surfaces/neptune.jpg';
 
+// Space facts for Saturn, Uranus and Neptune
+const spaceFacts = {
+  'Saturn': [
+    "Did you know? Saturn's rings are made of billions of ice particles, ranging from tiny dust-sized bits to chunks as big as houses!",
+    "Saturn is so light it could float in a bathtub... if you could find one big enough!",
+    "A day on Saturn lasts only 10.7 hours, but a year is 29 Earth years. Monday feels quick but the weekend takes forever!"
+  ],
+  'Uranus': [
+    "Fun fact: Uranus rotates sideways! It's basically rolling around the Sun like a cosmic bowling ball.",
+    "Did you know? Scientists have only spent 2% of their research time explaining how to properly pronounce 'Uranus'.",
+    "Uranus has 13 rings, but they're so dark and faint that most people forget to invite them to the planetary ring parties."
+  ],
+  'Neptune': [
+    "Did you know? Neptune has the strongest winds in the solar system, reaching up to 1,200 mph. Your bad hair day could be MUCH worse!",
+    "Neptune has only completed ONE orbit since its discovery in 1846. Talk about a long year!",
+    "Neptune's moon Triton is slowly spiraling inward and will eventually be torn apart by gravity. Planetary scientists call this 'the ultimate breakup'."
+  ]
+};
+
 // Add landing alert styles
 const landingAlertStyles = {
   position: 'fixed',
@@ -418,6 +437,84 @@ const LandingAlert = ({ planet }: { planet: string | null }) => {
   );
 };
 
+// Add FunFactCard component
+const FunFactCard = ({ planet }: { planet: string }) => {
+  const [currentFact, setCurrentFact] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    // Check if we're on mobile
+    setIsMobile(window.innerWidth < 768);
+    
+    // Handle window resize
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  useEffect(() => {
+    // Rotate through facts every 10 seconds
+    const interval = setInterval(() => {
+      setCurrentFact(prev => (prev + 1) % spaceFacts[planet as keyof typeof spaceFacts].length);
+    }, 10000);
+    
+    return () => clearInterval(interval);
+  }, [planet]);
+
+  // If there are no facts for this planet, don't show anything
+  if (!spaceFacts[planet as keyof typeof spaceFacts]) return null;
+
+  return (
+    <div className="absolute inset-0 flex items-center justify-center z-[1005]">
+      <div 
+        style={{
+          maxWidth: isMobile ? '90%' : '70%',
+          padding: '2rem',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: '1rem',
+          border: '2px solid rgba(255, 255, 255, 0.2)',
+          color: 'white',
+          fontFamily: "'Space Mono', 'Orbitron', monospace",
+          textAlign: 'center',
+          textShadow: '0 0 10px rgba(128, 230, 255, 0.8)',
+          fontSize: isMobile ? '1.2rem' : '1.8rem',
+          animation: 'pulse 2s infinite ease-in-out',
+          boxShadow: '0 0 50px rgba(100, 200, 255, 0.3)',
+          transition: 'all 0.5s ease'
+        }}
+      >
+        {spaceFacts[planet as keyof typeof spaceFacts][currentFact]}
+      </div>
+      <style jsx global>{`
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.03); }
+        }
+        
+        @font-face {
+          font-family: 'Space Mono';
+          font-style: normal;
+          font-weight: 400;
+          font-display: swap;
+          src: url(https://fonts.gstatic.com/s/spacemono/v12/i7dPIFZifjKcF5UAWdDRYEF8RQ.woff2) format('woff2');
+        }
+        
+        @font-face {
+          font-family: 'Orbitron';
+          font-style: normal;
+          font-weight: 400;
+          font-display: swap;
+          src: url(https://fonts.gstatic.com/s/orbitron/v29/yMJMMIlzdpvBhQQL_SC3X9yhF25-T1nyGy6xpmIyXjU1pg.woff2) format('woff2');
+        }
+      `}</style>
+    </div>
+  );
+};
+
 // Surface view component
 const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () => void }) => {
   const [surfaceImage, setSurfaceImage] = useState<string | null>(null);
@@ -527,6 +624,11 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         </div>
       )}
       
+      {/* Show FunFactCard on Saturn, Uranus, and Neptune */}
+      {(planet === 'Saturn' || planet === 'Uranus' || planet === 'Neptune') && planet && (
+        <FunFactCard planet={planet} />
+      )}
+      
       <div style={{
         position: 'fixed',
         top: '20px',
@@ -540,12 +642,14 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         cursor: 'pointer',
         zIndex: 1010
       }} onClick={onClose}>
-        {planet === 'Mars' ? 'Exit Projects' : 
-         planet === 'Earth' ? 'Exit About Me' : 
-         planet === 'Venus' ? 'Exit Skills' : 
-         planet === 'Jupiter' ? 'Exit Achievements' : 
-         planet === 'Mercury' ? 'Exit Contact' : 
-         'Click anywhere to return'}
+        {planet === 'Mars' ? 'Exit' : 
+         planet === 'Earth' ? 'Exit' : 
+         planet === 'Venus' ? 'Exit' : 
+         planet === 'Jupiter' ? 'Exit' : 
+         planet === 'Mercury' ? 'Exit' : 
+         planet === 'Uranus' ? 'Exit' : 
+         planet === 'Neptune' ? 'Exit' : 
+         planet === 'Saturn' ? 'Exit' : 'Exit'}
       </div>
       
       <div style={{
@@ -901,9 +1005,9 @@ export default function Scene() {
           
           <button
             onClick={handleCloseSurface}
-            className="fixed top-4 right-4 bg-black/60 hover:bg-black/80 text-white px-5 py-2.5 rounded-full z-[1010] font-['Orbitron'] text-sm border border-white/20 hover:border-white/40 transition-all duration-300"
+            className="fixed top-4 right-4 bg-black/60 hover:bg-black/80 text-white px-5 py-2.5 rounded-full z-[1010] font-['Orbitron'] text-sm border-none transition-all duration-300"
           >
-            Exit Projects
+            Exit
           </button>
           
           <div className="fixed bottom-4 left-4 bg-black/60 text-white px-5 py-2.5 rounded-full z-[1010] font-['Orbitron'] border border-white/20">

@@ -6,37 +6,37 @@ import { MovingBorderCard } from './ui/moving-border';
 export default function JupiterAchievements() {
   const achievements = [
     {
-      title: "Stellar Coding Competition Winner",
-      description: "First place in the Galactic Code Challenge, recognized for innovative algorithm design",
-      year: "2023"
+      title: "Semi-finalist in EY Techathon 5.0",
+      description: "Got into the top 47 out of 10,000+ teams in EY Techathon 5.0",
+      year: "Feb 2025"
     },
     {
-      title: "Open Source Contributor",
-      description: "Top 1% contributor to Space Navigation frameworks with over 200 accepted PRs",
-      year: "2022"
+      title: "National Hackathon Winner",
+      description: "Got 1st prize (AI/ML domain) in “Hack Attack” national hackathon organized by Anurag University",
+      year: "Dec 2024"
     },
     {
-      title: "Hackathon Champion",
-      description: "Led team to victory in NASA Space Apps Challenge with an orbital debris tracking solution",
-      year: "2021"
+      title: "Won a track in “Hack Your Portfolio” international hackathon",
+      description: "Got 1st prize of 'Best Beginner's' track in “Hack Your Portfolio” international hackathon hosted by MLH",
+      year: "July 2024"
     }
   ];
 
   const certifications = [
     {
-      title: "AWS Cloud Architect",
-      issuer: "Amazon Web Services",
+      title: "Google Cloud Computing Foundations and Generative AI certification",
+      issuer: "Google Cloud",
+      date: "2024"
+    },
+    {
+      title: "JP. Morgan - Software Engineering Job Simulation",
+      issuer: "Forage",
+      date: "2024"
+    },
+    {
+      title: "Certificate of Proficiency - Spanish",
+      issuer: "English and Foreign Languages University (EFLU)",
       date: "2023"
-    },
-    {
-      title: "Advanced React & Next.js",
-      issuer: "Frontend Masters",
-      date: "2022"
-    },
-    {
-      title: "Three.js & WebGL Mastery",
-      issuer: "Creative Coding Institute",
-      date: "2021"
     }
   ];
 
@@ -56,7 +56,7 @@ export default function JupiterAchievements() {
           duration={1500}
         >
           <div className="space-y-8">
-            <h2 className="text-2xl font-bold text-center text-white mb-8" style={{ fontFamily: 'var(--font-orbitron)' }}>
+            <h2 className="text-2xl font-bold text-center text-orange-500 mb-8" style={{ fontFamily: 'var(--font-orbitron)' }}>
               ACHIEVEMENTS
             </h2>
             <div className="space-y-8">
@@ -86,7 +86,7 @@ export default function JupiterAchievements() {
           duration={1500}
         >
           <div className="space-y-8">
-            <h2 className="text-2xl font-bold text-center text-white mb-8" style={{ fontFamily: 'var(--font-orbitron)' }}>
+            <h2 className="text-2xl font-bold text-center text-violet-500 mb-8" style={{ fontFamily: 'var(--font-orbitron)' }}>
               CERTIFICATIONS
             </h2>
             <div className="space-y-8">

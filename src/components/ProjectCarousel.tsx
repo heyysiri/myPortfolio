@@ -2,7 +2,7 @@
 import { IconArrowNarrowRight } from "@tabler/icons-react";
 import { useState, useRef, useId, useEffect } from "react";
 import { LinkPreview } from "./LinkPreview";
-import { HoverBorderGradient } from "./HoverBorderGradient";
+import { HoverBorderGradient } from "./ui/HoverBorderGradient";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
