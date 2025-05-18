@@ -36,10 +36,10 @@ const neptuneSurface = '/surfaces/neptune.jpg';
 
 // Space facts for Saturn, Uranus and Neptune
 const spaceFacts = {
-  'Saturn': [
-    "Did you know? Saturn's rings are made of billions of ice particles, ranging from tiny dust-sized bits to chunks as big as houses!",
-    "Saturn is so light it could float in a bathtub... if you could find one big enough!",
-    "A day on Saturn lasts only 10.7 hours, but a year is 29 Earth years. Monday feels quick but the weekend takes forever!"
+  'Earth': [
+    "Did you know? Earth is the only planet not named after a god. It comes from the Old English word 'ertha' meaning ground or soil!",
+    "Earth is the densest planet in our solar system. That's heavy stuff!",
+    "Our planet Earth is traveling through space at 67,000 mph. Yet somehow we're still late for meetings!"
   ],
   'Uranus': [
     "Fun fact: Uranus rotates sideways! It's basically rolling around the Sun like a cosmic bowling ball.",
@@ -572,7 +572,7 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         backgroundColor: 'black',
         animation: 'fadeIn 1s forwards'
       }}
-      onClick={planet !== 'Mars' && planet !== 'Earth' && planet !== 'Venus' && planet !== 'Jupiter' && planet !== 'Mercury' ? onClose : undefined}
+      onClick={planet !== 'Mars' && planet !== 'Saturn' && planet !== 'Venus' && planet !== 'Jupiter' && planet !== 'Mercury' ? onClose : undefined}
     >
       <img 
         src={surfaceImage} 
@@ -580,12 +580,12 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         style={{
           ...surfaceImageStyles,
           filter: planet === 'Mars' ? 'none' : 'brightness(0.7)',
-          opacity: planet === 'Earth' || planet === 'Mars' || planet === 'Venus' || planet === 'Mercury' ? 0.6 : 1
+          opacity: planet === 'Saturn' || planet === 'Mars' || planet === 'Venus' || planet === 'Mercury' ? 0.6 : 1
         }}
       />
       
-      {/* Dark overlay for Earth, Mars and Venus */}
-      {(planet === 'Earth' || planet === 'Mars' || planet === 'Venus' || planet === 'Mercury') && (
+      {/* Dark overlay for Saturn, Mars and Venus */}
+      {(planet === 'Saturn' || planet === 'Mars' || planet === 'Venus' || planet === 'Mercury') && (
         <div className="absolute inset-0 bg-black/50 z-[1001]"></div>
       )}
       
@@ -596,8 +596,8 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         </div>
       )}
       
-      {/* Show AboutMe component on Earth */}
-      {planet === 'Earth' && (
+      {/* Show AboutMe component on Saturn */}
+      {planet === 'Saturn' && (
         <div className="absolute inset-0 flex items-center justify-center z-[1005]">
           <AboutMe />
         </div>
@@ -624,8 +624,8 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         </div>
       )}
       
-      {/* Show FunFactCard on Saturn, Uranus, and Neptune */}
-      {(planet === 'Saturn' || planet === 'Uranus' || planet === 'Neptune') && planet && (
+      {/* Show FunFactCard on Earth, Uranus, and Neptune */}
+      {(planet === 'Earth' || planet === 'Uranus' || planet === 'Neptune') && planet && (
         <FunFactCard planet={planet} />
       )}
       
@@ -664,11 +664,14 @@ const SurfaceView = ({ planet, onClose }: { planet: string | null; onClose: () =
         borderRadius: '5px',
         zIndex: 1010
       }}>
-        {planet === 'Mars' ? 'MY PROJECTS' : 
-         planet === 'Earth' ? 'ABOUT ME' : 
-         planet === 'Venus' ? 'MY SKILLS' : 
-         planet === 'Jupiter' ? 'MY ACHIEVEMENTS' : 
-         planet === 'Mercury' ? 'CONTACT ME' : 
+        {planet === 'Mars' ? 'Mars' : 
+         planet === 'Earth' ? 'Earth' : 
+         planet === 'Venus' ? 'Venus' : 
+         planet === 'Jupiter' ? 'Jupiter' : 
+         planet === 'Mercury' ? 'Mercury' : 
+         planet === 'Saturn' ? 'Saturn' : 
+         planet === 'Uranus' ? 'Uranus' : 
+         planet === 'Neptune' ? 'Neptune' : 
          `${planet.toUpperCase()} SURFACE`}
       </div>
     </div>,
@@ -706,6 +709,62 @@ const ResponsiveCanvasWrapper = ({ children }: { children: React.ReactNode }) =>
   );
 };
 
+// Planet click popup notification
+const PlanetClickPopup = () => {
+  const [showPopup, setShowPopup] = useState(false);
+  
+  useEffect(() => {
+    // Small delay to ensure the page has fully loaded
+    const timer = setTimeout(() => {
+      setShowPopup(true);
+      
+      // Hide after 3 seconds
+      const hideTimer = setTimeout(() => {
+        setShowPopup(false);
+      }, 3000);
+      
+      return () => clearTimeout(hideTimer);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  if (!showPopup) return null;
+  
+  return createPortal(
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '20px',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      color: '#ffffff',
+      padding: '12px 20px',
+      borderRadius: '5px',
+      border: '2px solid rgba(100, 200, 255, 0.5)',
+      fontFamily: "'Orbitron', sans-serif",
+      fontSize: '25px',
+      zIndex: 1000,
+      animation: 'fadeIn 0.3s ease-in-out, fadeOut 0.3s ease-in-out 2.7s',
+      boxShadow: '0 0 20px rgba(100, 200, 255, 0.3)',
+      textShadow: '0 0 10px rgba(100, 200, 255, 0.8)',
+    }}>
+      Click on any planet!
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(20px); }
+        }
+      `}</style>
+    </div>,
+    document.body
+  );
+};
+
 export default function Scene() {
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
   const [showSurface, setShowSurface] = useState(false);
@@ -740,8 +799,6 @@ export default function Scene() {
   // Get planet hover label content
   const getTooltipContent = (planetName: string) => {
     switch (planetName) {
-      case 'Earth':
-        return 'About Me';
       case 'Mars':
         return 'Projects';
       case 'Venus':
@@ -750,8 +807,10 @@ export default function Scene() {
         return '🏆 🎓'; // Trophy and certificate emojis
       case 'Mercury':
         return 'Contact';
+      case 'Saturn':
+        return 'About Me';
       default:
-        return 'Hello!'; // For Saturn, Uranus, Neptune
+        return 'Hello!'; // For Uranus, Neptune
     }
   };
   
@@ -936,6 +995,7 @@ export default function Scene() {
       </ResponsiveCanvasWrapper>
       
       <LandingAlert planet={selectedPlanet} />
+      <PlanetClickPopup />
       
       {/* Planet Hover Label - outside of Canvas context */}
       {hoveredPlanet && !selectedPlanet && (
