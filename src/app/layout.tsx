@@ -21,10 +21,10 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "3D Solar System",
-  description: "Interactive 3D Solar System built with React Three Fiber",
+  title: "Siri's Portfolio",
+  description: "My portfolio website made with Next.js and React Three Fiber",
   icons: {
-    icon: '/favicon.ico',
+    icon: '/gallery/planet.png',
   },
 };
 
