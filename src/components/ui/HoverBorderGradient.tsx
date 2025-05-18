@@ -9,19 +9,18 @@ export function HoverBorderGradient({
   children,
   containerClassName,
   className,
-  as: Tag = "div",
+  as = "div",
   duration = 1,
   clockwise = true,
   ...props
-}: React.PropsWithChildren<
-  {
-    as?: React.ElementType;
-    containerClassName?: string;
-    className?: string;
-    duration?: number;
-    clockwise?: boolean;
-  } & React.HTMLAttributes<HTMLElement>
->) {
+}: {
+  children: React.ReactNode;
+  containerClassName?: string;
+  className?: string;
+  as?: React.ElementType;
+  duration?: number;
+  clockwise?: boolean;
+} & React.HTMLAttributes<HTMLElement>) {
   const [hovered, setHovered] = useState<boolean>(false);
   const [direction, setDirection] = useState<Direction>("TOP");
 
@@ -53,18 +52,9 @@ export function HoverBorderGradient({
     }
   }, [hovered, duration]);
 
-  return (
-    <Tag
-      onMouseEnter={() => {
-        setHovered(true);
-      }}
-      onMouseLeave={() => setHovered(false)}
-      className={cn(
-        "relative flex rounded-xl border content-center bg-black/20 hover:bg-black/10 transition duration-500 dark:bg-white/5 items-center flex-col flex-nowrap gap-10 h-min justify-center overflow-visible p-[2px] decoration-clone w-fit",
-        containerClassName
-      )}
-      {...props}
-    >
+  // Content elements to render inside the container
+  const contentElements = (
+    <>
       <div
         className={cn(
           "w-auto text-white z-10 bg-black px-4 py-2 rounded-[inherit]",
@@ -96,6 +86,21 @@ export function HoverBorderGradient({
       
       {/* Background fill */}
       <div className="bg-black absolute z-1 flex-none inset-[2px] rounded-[inherit]" />
-    </Tag>
+    </>
+  );
+
+  // Use createElement instead of JSX to avoid TypeScript issues with dynamic components
+  return React.createElement(
+    as,
+    {
+      onMouseEnter: () => setHovered(true),
+      onMouseLeave: () => setHovered(false),
+      className: cn(
+        "relative flex rounded-xl border content-center bg-black/20 hover:bg-black/10 transition duration-500 dark:bg-white/5 items-center flex-col flex-nowrap gap-10 h-min justify-center overflow-visible p-[2px] decoration-clone w-fit",
+        containerClassName
+      ),
+      ...props,
+    },
+    contentElements
   );
 }

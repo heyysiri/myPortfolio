@@ -1,7 +1,6 @@
 "use client";
 import { IconArrowNarrowRight } from "@tabler/icons-react";
 import { useState, useRef, useId, useEffect } from "react";
-import { LinkPreview } from "./LinkPreview";
 import { HoverBorderGradient } from "./ui/HoverBorderGradient";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -144,13 +143,13 @@ const ProjectSlide = ({ project, index, current, handleSlideClick }: ProjectSlid
                 </div>
               </div>
 
-              <div className="flex justify-center relative" style={{ transform: 'translateZ(25px)' }}>
+              {/* <div className="flex justify-center relative" style={{ transform: 'translateZ(25px)' }}>
                 <LinkPreview
                   imageSrc={previewImage}
                   width={400}
                   height={250}
                   className="group"
-                >
+                > 
                   <button className="mt-2 px-5 py-2.5 font-medium bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 transition-all duration-300 flex items-center gap-2">
                     View Project
                     <span className="inline-block transition-transform group-hover:translate-x-1">
@@ -158,7 +157,7 @@ const ProjectSlide = ({ project, index, current, handleSlideClick }: ProjectSlid
                     </span>
                   </button>
                 </LinkPreview>
-              </div>
+              </div> */}
             </article>
           </HoverBorderGradient>
         </div>

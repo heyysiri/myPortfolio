@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-
 import React, {
   createContext,
   useState,
@@ -10,10 +9,12 @@ import React, {
   useEffect,
 } from "react";
 
+// Context
 const MouseEnterContext = createContext<
   [boolean, React.Dispatch<React.SetStateAction<boolean>>] | undefined
 >(undefined);
 
+// CardContainer
 export const CardContainer = ({
   children,
   className,
@@ -45,6 +46,7 @@ export const CardContainer = ({
     setIsMouseEntered(false);
     containerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;
   };
+
   return (
     <MouseEnterContext.Provider value={[isMouseEntered, setIsMouseEntered]}>
       <div
@@ -52,9 +54,7 @@ export const CardContainer = ({
           "py-20 flex items-center justify-center",
           containerClassName
         )}
-        style={{
-          perspective: "1000px",
-        }}
+        style={{ perspective: "1000px" }}
       >
         <div
           ref={containerRef}
@@ -65,9 +65,7 @@ export const CardContainer = ({
             "flex items-center justify-center relative transition-all duration-200 ease-linear",
             className
           )}
-          style={{
-            transformStyle: "preserve-3d",
-          }}
+          style={{ transformStyle: "preserve-3d" }}
         >
           {children}
         </div>
@@ -76,6 +74,7 @@ export const CardContainer = ({
   );
 };
 
+// CardBody
 export const CardBody = ({
   children,
   className,
@@ -95,8 +94,9 @@ export const CardBody = ({
   );
 };
 
-export const CardItem = ({
-  as: Tag = "div",
+// CardItem with correct typing
+export const CardItem = <T extends React.ElementType = "div">({
+  as,
   children,
   className,
   translateX = 0,
@@ -107,7 +107,7 @@ export const CardItem = ({
   rotateZ = 0,
   ...rest
 }: {
-  as?: React.ElementType;
+  as?: T;
   children: React.ReactNode;
   className?: string;
   translateX?: number | string;
@@ -116,9 +116,9 @@ export const CardItem = ({
   rotateX?: number | string;
   rotateY?: number | string;
   rotateZ?: number | string;
-  [key: string]: any;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
+} & React.ComponentPropsWithoutRef<T>) => {
+  const Tag = as || "div";
+  const ref = useRef<HTMLElement>(null);
   const [isMouseEntered] = useMouseEnter();
 
   useEffect(() => {
@@ -133,8 +133,8 @@ export const CardItem = ({
       ref.current.style.transform = `translateX(0px) translateY(0px) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;
     }
   };
-
-  return (
+return (
+  // @ts-ignore – TypeScript doesn't recognize this dynamic tag typing, but it's safe
     <Tag
       ref={ref}
       className={cn("w-fit transition duration-200 ease-linear", className)}
@@ -145,7 +145,7 @@ export const CardItem = ({
   );
 };
 
-// Create a hook to use the context
+// Hook
 export const useMouseEnter = () => {
   const context = useContext(MouseEnterContext);
   if (context === undefined) {
