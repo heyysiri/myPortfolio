@@ -6,6 +6,11 @@ import { MovingBorderCard } from './ui/moving-border';
 export default function JupiterAchievements() {
   const achievements = [
     {
+  title: "5th Place in Puch AI Hackathon",
+  description: "Ranked 5th out of 168 teams and 25,000+ participants",
+  year: "Aug 2025"
+},
+    {
       title: "Semi-finalist in EY Techathon 5.0",
       description: "Got into the top 47 out of 10,000+ teams in EY Techathon 5.0",
       year: "Feb 2025"
@@ -23,6 +28,11 @@ export default function JupiterAchievements() {
   ];
 
   const certifications = [
+    {
+  title: "Google AI Essentials Specialization",
+  issuer: "Google",
+  date: "2026"
+},
     {
       title: "Google Cloud Computing Foundations and Generative AI certification",
       issuer: "Google Cloud",

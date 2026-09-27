@@ -147,7 +147,7 @@ export default function AboutMe() {
             falloff="exponential"
           />
         </div>
-        <h2 className="text-xl md:text-2xl mt-4 text-blue-300" style={{ fontFamily: 'var(--font-orbitron)' }}>Full-Stack Developer & AI Enthusiast</h2>
+        <h2 className="text-xl md:text-2xl mt-4 text-blue-300" style={{ fontFamily: 'var(--font-orbitron)' }}>AI Engineer</h2>
       </motion.div>
 
       <motion.div 
@@ -161,7 +161,7 @@ export default function AboutMe() {
           className="relative"
         >
           <VariableProximity
-            label="Hi! I’m a 3rd-year Computer Science undergraduate with a strong passion for building meaningful things on the web and a growing curiosity in the world of AI.
+            label="Hi! I’m a 2026 Computer Science graduate and AI Engineer passionate about building intelligent products that solve real-world problems. I love turning ideas into practical AI-powered experiences.
 Beyond tech, I’m a huge Potterhead, a music enthusiast, and an avid chess player who enjoys a good strategic challenge — both on and off the board.
 
 I’m always up for learning something new, collaborating on exciting projects, and turning ideas into impact."

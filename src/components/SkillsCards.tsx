@@ -47,7 +47,7 @@ export const SkillsCards = () => {
       className: "absolute left-[37%] top-[58%] rotate-[-10deg]",
     },
     {
-      title: "Node.js",
+      title: "Jenkins",
       className: "absolute left-[62%] top-[58%] rotate-[12deg]",
     },
     {
@@ -55,11 +55,11 @@ export const SkillsCards = () => {
       className: "absolute left-[85%] top-[55%] rotate-[18deg]",
     },
     {
-      title: "Express.js",
+      title: "Langgraph",
       className: "absolute left-[18%] top-[75%] rotate-[15deg]",
     },
     {
-      title: "Flask",
+      title: "Flask/FastAPI",
       className: "absolute left-[45%] top-[78%] rotate-[7deg]",
     },
     {
@@ -67,7 +67,7 @@ export const SkillsCards = () => {
       className: "absolute left-[70%] top-[75%] rotate-[10deg]",
     },
     {
-      title: "Windows",
+      title: "MCP",
       className: "absolute left-[10%] top-[90%] rotate-[-5deg]",
     },
     {
